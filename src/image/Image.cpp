@@ -1,5 +1,7 @@
-#include "silhouette/image/Image.h"
+#include "silhouette/Image/Image.h"
 
+#include "canvas/Math/Common.h"
+#include "canvas/Renderer/Renderer.h"
 #include "nucleus/Logging.h"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -11,7 +13,7 @@ namespace si {
 Image Image::createAlpha(const ca::Size& size, U8 intensity) {
   Image result;
 
-  result.m_format = ImageFormat::Alpha;
+  result.m_format = ca::TextureFormat::Alpha;
   result.m_size = size;
   result.m_data.resize(size.width * size.height, intensity);
 
@@ -46,10 +48,10 @@ void Image::create(const ca::Size& size, const ca::Color& col) {
     U8* data = m_data.getData();
     U8* end = data + m_data.getSize();
     while (data < end) {
-      *data++ = static_cast<U8>(std::round(col.r * 255.0f));
-      *data++ = static_cast<U8>(std::round(col.g * 255.0f));
-      *data++ = static_cast<U8>(std::round(col.b * 255.0f));
-      *data++ = static_cast<U8>(std::round(col.a * 255.0f));
+      *data++ = static_cast<U8>(ca::round(col.r * 255.0f));
+      *data++ = static_cast<U8>(ca::round(col.g * 255.0f));
+      *data++ = static_cast<U8>(ca::round(col.b * 255.0f));
+      *data++ = static_cast<U8>(ca::round(col.a * 255.0f));
     }
   } else {
     // Store the size and clear out the scene.
@@ -61,20 +63,42 @@ void Image::create(const ca::Size& size, const ca::Color& col) {
 bool Image::loadFromStream(nu::InputStream* stream) {
   DCHECK(stream);
 
+  nu::InputStream::SizeType bytesRemaining = stream->getBytesRemaining();
+
   nu::DynamicArray<U8> buffer;
-  buffer.reserve(stream->getBytesRemaining());
+  buffer.resize(bytesRemaining);
   stream->read(buffer.getData(), buffer.getSize());
 
   I32 x = 0, y = 0, channels = 0;
   stbi_uc* result = stbi_load_from_memory(buffer.getData(), buffer.getSize(), &x, &y, &channels, 4);
 
   MemSize size = channels * x * y;
-  m_data.reserve(size);
+  m_data.resize(size);
   std::memcpy(m_data.getData(), result, size);
 
   stbi_image_free(result);
 
-  return false;
+  m_size = {x, y};
+
+  switch (channels) {
+    case 4:
+      m_format = ca::TextureFormat::RGBA;
+      break;
+
+    case 3:
+      m_format = ca::TextureFormat::RGB;
+      break;
+
+    case 1:
+      m_format = ca::TextureFormat::Alpha;
+      break;
+
+    default:
+      NOTREACHED();
+      break;
+  }
+
+  return true;
 }
 
 void Image::setPixel(const ca::Pos& pos, const ca::Color& color) {
@@ -82,7 +106,16 @@ void Image::setPixel(const ca::Pos& pos, const ca::Color& color) {
   *ptr++ = static_cast<U8>(round(color.r));
   *ptr++ = static_cast<U8>(round(color.g));
   *ptr++ = static_cast<U8>(round(color.b));
-  *ptr++ = static_cast<U8>(round(color.a));
+  *ptr = static_cast<U8>(round(color.a));
+}
+
+ca::TextureId createTextureFromImage(ca::Renderer* renderer, const Image& image, bool smooth) {
+#if 0
+  LOG(Info) << "Creating texture: format = " << (U32)image.m_format << ", size = " << image.m_size;
+#endif  // 0
+
+  return renderer->createTexture(image.m_format, image.m_size, image.m_data.getData(),
+                                 image.m_data.getSize(), smooth);
 }
 
 }  // namespace si

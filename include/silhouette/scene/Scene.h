@@ -1,15 +1,28 @@
 #ifndef SILHOUETTE_SCENE_SCENE_H_
 #define SILHOUETTE_SCENE_SCENE_H_
 
-#include "nucleus/containers/DynamicArray.h"
-#include "silhouette/scene/Mesh.h"
+#include "canvas/Math/Mat4.h"
+#include "canvas/Math/Vec3.h"
+#include "nucleus/Containers/DynamicArray.h"
 
 namespace si {
 
-struct Scene {
-  nu::DynamicArray<Mesh> meshes;
+struct Mesh {
+  nu::DynamicArray<ca::Vec3> vertices;
+  nu::DynamicArray<U16> indices;
 };
 
-} // namespace si
+struct Node {
+  ca::Mat4 transform{ca::Mat4::identity};
+  nu::DynamicArray<MemSize> meshIndices;
+  nu::DynamicArray<Node> children;
+};
 
-#endif // SILHOUETTE_SCENE_SCENE_H_
+struct Scene {
+  nu::DynamicArray<Mesh> meshes;
+  Node rootNode;
+};
+
+}  // namespace si
+
+#endif  // SILHOUETTE_SCENE_SCENE_H_

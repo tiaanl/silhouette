@@ -6,20 +6,19 @@ add_subdirectory(../canvas canvas)
 add_subdirectory(../assimp assimp)
 
 set(silhouette_HEADER_FILES
-    include/silhouette/image/Image.h
-    include/silhouette/import/Import.h
-    include/silhouette/scene/Mesh.h
-    include/silhouette/scene/Scene.h
+    include/silhouette/Image/Image.h
+    include/silhouette/Import/Import.h
+    include/silhouette/Scene/Scene.h
     )
 
 set(silhouette_SOURCE_FILES
-    src/image/Image.cpp
-    src/import/Collada.cpp
-    src/scene/Scene.cpp
+    src/Image/Image.cpp
+    src/Import/Collada.cpp
+    src/Scene/Scene.cpp
     )
 
 set(silhouette_TEST_FILES
-    tests/scene/SceneTests.cpp
+    tests/Scene/SceneTests.cpp
     )
 
 add_library(silhouette ${silhouette_HEADER_FILES} ${silhouette_SOURCE_FILES})

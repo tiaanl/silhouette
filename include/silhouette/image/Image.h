@@ -1,20 +1,20 @@
 #ifndef SILHOUETTE_IMAGE_IMAGE_H_
 #define SILHOUETTE_IMAGE_IMAGE_H_
 
+#include "canvas/Renderer/Types.h"
 #include "canvas/Utils/Color.h"
 #include "canvas/Utils/Pos.h"
 #include "canvas/Utils/Size.h"
 #include "nucleus/Containers/DynamicArray.h"
 #include "nucleus/Streams/InputStream.h"
 
-namespace si {
+namespace ca {
 
-enum class ImageFormat : U32 {
-  Unknown,
-  Alpha,
-  RGB,
-  RGBA,
-};
+class Renderer;
+
+}  // namespace ca
+
+namespace si {
 
 class Image {
 public:
@@ -27,17 +27,17 @@ public:
 
   Image& operator=(Image&& other);
 
-  ImageFormat getFormat() const {
+  ca::TextureFormat format() const {
     return m_format;
   }
 
   // Get the size of the image.
-  const ca::Size& getSize() const {
+  const ca::Size& size() const {
     return m_size;
   }
 
   // Get the pixel scene for the image.
-  U8* getData() const {
+  U8* data() const {
     return const_cast<U8*>(m_data.getData());
   }
   // Create a blank image with the specified color.
@@ -52,8 +52,10 @@ public:
 private:
   DELETE_COPY(Image);
 
+  friend ca::TextureId createTextureFromImage(ca::Renderer*, const Image&, bool);
+
   // Format of the scene is stored in.
-  ImageFormat m_format = ImageFormat::Unknown;
+  ca::TextureFormat m_format = ca::TextureFormat::Unknown;
 
   // The dimensions of the image.
   ca::Size m_size;
@@ -61,6 +63,9 @@ private:
   // The buffer that holds the pixel scene.
   nu::DynamicArray<U8> m_data;
 };
+
+ca::TextureId createTextureFromImage(ca::Renderer* renderer, const Image& image,
+                                     bool smooth = false);
 
 }  // namespace si
 

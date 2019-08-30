@@ -3,7 +3,7 @@
 
 #include "nucleus/FilePath.h"
 #include "nucleus/Streams/InputStream.h"
-#include "silhouette/scene/Scene.h"
+#include "silhouette/Scene/Scene.h"
 
 namespace si {
 
