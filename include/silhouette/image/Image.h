@@ -40,6 +40,12 @@ public:
   U8* data() const {
     return const_cast<U8*>(m_data.data());
   }
+
+  // The size in bytes of the stored image data.
+  MemSize dataSize() const {
+    return m_data.size();
+  }
+
   // Create a blank image with the specified color.
   void create(const ca::Size& size, const ca::Color& col = ca::Color::black);
 
