@@ -38,7 +38,7 @@ public:
 
   // Get the pixel scene for the image.
   U8* data() const {
-    return const_cast<U8*>(m_data.getData());
+    return const_cast<U8*>(m_data.data());
   }
   // Create a blank image with the specified color.
   void create(const ca::Size& size, const ca::Color& col = ca::Color::black);

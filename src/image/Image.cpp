@@ -45,8 +45,8 @@ void Image::create(const ca::Size& size, const ca::Color& col) {
     m_data.resize(bufferSize);
 
     // Fill the image with the specified color.
-    U8* data = m_data.getData();
-    U8* end = data + m_data.getSize();
+    U8* data = m_data.data();
+    U8* end = data + m_data.size();
     while (data < end) {
       *data++ = static_cast<U8>(ca::round(col.r * 255.0f));
       *data++ = static_cast<U8>(ca::round(col.g * 255.0f));
@@ -67,14 +67,15 @@ bool Image::loadFromStream(nu::InputStream* stream) {
 
   nu::DynamicArray<U8> buffer;
   buffer.resize(bytesRemaining);
-  stream->read(buffer.getData(), buffer.getSize());
+  stream->read(buffer.data(), buffer.size());
 
   I32 x = 0, y = 0, channels = 0;
-  stbi_uc* result = stbi_load_from_memory(buffer.getData(), buffer.getSize(), &x, &y, &channels, 4);
+  stbi_uc* result =
+      stbi_load_from_memory(buffer.data(), static_cast<int>(buffer.size()), &x, &y, &channels, 4);
 
-  MemSize size = channels * x * y;
+  MemSize size = static_cast<I64>(channels) * x * y;
   m_data.resize(size);
-  std::memcpy(m_data.getData(), result, size);
+  std::memcpy(m_data.data(), result, size);
 
   stbi_image_free(result);
 
@@ -114,8 +115,8 @@ ca::TextureId createTextureFromImage(ca::Renderer* renderer, const Image& image,
   LOG(Info) << "Creating texture: format = " << (U32)image.m_format << ", size = " << image.m_size;
 #endif  // 0
 
-  return renderer->createTexture(image.m_format, image.m_size, image.m_data.getData(),
-                                 image.m_data.getSize(), smooth);
+  return renderer->createTexture(image.m_format, image.m_size, image.m_data.data(),
+                                 image.m_data.size(), smooth);
 }
 
 }  // namespace si

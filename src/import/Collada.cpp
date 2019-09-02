@@ -18,14 +18,13 @@ void createMesh(Mesh* mesh, aiMesh* impMesh) {
   for (U32 i = 0; i < impMesh->mNumVertices; ++i) {
     aiVector3D& impVec = impMesh->mVertices[i];
     mesh->vertices.emplaceBack(impVec.x, impVec.y, impVec.z);
-
-    mesh->indices.emplaceBack(index++);
-    mesh->indices.emplaceBack(index++);
     mesh->indices.emplaceBack(index++);
   }
 }
 
 void createNode(Node* node, aiNode* impNode) {
+  LOG(Info) << "createNode (" << impNode->mName.data << ") >>>";
+
   node->transform.col[0] = ca::Vec4{impNode->mTransformation.a1, impNode->mTransformation.b1,
                                     impNode->mTransformation.c1, impNode->mTransformation.d1};
   node->transform.col[1] = ca::Vec4{impNode->mTransformation.a2, impNode->mTransformation.b2,
@@ -35,22 +34,22 @@ void createNode(Node* node, aiNode* impNode) {
   node->transform.col[3] = ca::Vec4{impNode->mTransformation.a4, impNode->mTransformation.b4,
                                     impNode->mTransformation.c4, impNode->mTransformation.d4};
 
+  LOG(Info) << "transform.col[0] = " << node->transform.col[0];
+  LOG(Info) << "transform.col[1] = " << node->transform.col[1];
+  LOG(Info) << "transform.col[2] = " << node->transform.col[2];
+  LOG(Info) << "transform.col[3] = " << node->transform.col[3];
+
   for (U32 i = 0; i < impNode->mNumMeshes; ++i) {
     node->meshIndices.emplaceBack(impNode->mMeshes[i]);
   }
 
+  LOG(Info) << "creating " << impNode->mNumChildren << " child nodes";
   for (U32 i = 0; i < impNode->mNumChildren; ++i) {
-#if 0
-    node->children.constructBack([impNode, i](Node* storage) {
-      new (storage) Node;
-
-      createNode(storage, impNode->mChildren[i]);
-    });
-#else
-  auto result = node->children.emplaceBack();
-  createNode(&result.element(), impNode->mChildren[i]);
-#endif
+    auto result = node->children.emplaceBack();
+    createNode(&result.element(), impNode->mChildren[i]);
   }
+
+  LOG(Info) << "<<< createNode";
 }
 
 }  // namespace
@@ -62,22 +61,21 @@ bool loadCollada(Scene* scene, nu::InputStream* stream) {
 
   nu::DynamicArray<U8> buffer;
   buffer.resize(bytesRemaining);
-  stream->read(buffer.getData(), bytesRemaining);
+  stream->read(buffer.data(), bytesRemaining);
 
-  const aiScene* imp = importer.ReadFileFromMemory(buffer.getData(), buffer.getSize(), 0);
+  const aiScene* imp = importer.ReadFileFromMemory(buffer.data(), buffer.size(), 0);
 
   for (U32 i = 0; i < imp->mNumMeshes; ++i) {
     aiMesh* impMesh = imp->mMeshes[i];
 
-#if 0
-    scene->meshes.constructBack([impMesh](Mesh* storage) {
-      new (storage) Mesh;
-      createMesh(storage, impMesh);
-    });
-#else
+    // We only do triangle meshes right now.
+    if (!(impMesh->mPrimitiveTypes & aiPrimitiveType_TRIANGLE)) {
+      LOG(Warning) << "Found non triangle mesh, skipping.";
+      continue;
+    }
+
     auto result = scene->meshes.emplaceBack();
     createMesh(&result.element(), impMesh);
-#endif  // 0
   }
 
   createNode(&scene->rootNode, imp->mRootNode);
