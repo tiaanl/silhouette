@@ -69,7 +69,7 @@ void createMaterial(Material* dst, aiMaterial* src) {
 
   unsigned int diffuseTextureCount = src->GetTextureCount(aiTextureType_DIFFUSE);
   if (diffuseTextureCount < 1) {
-    LOG(Warning) << "No diffuse textures found on material: " << src->GetName().data;
+    LOG(Warning) << "No diffuse textures found on material.";
   } else {
     if (diffuseTextureCount > 1) {
       LOG(Warning) << "Only one diffuse texture is supported. " << diffuseTextureCount << " found.";
