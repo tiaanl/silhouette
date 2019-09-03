@@ -13,7 +13,6 @@ struct Mesh {
   MemSize materialIndex;
   nu::DynamicArray<ca::Vec3> positions;
   nu::DynamicArray<ca::Vec2> texCoords;
-  nu::DynamicArray<U16> indices;
 };
 
 struct Node {

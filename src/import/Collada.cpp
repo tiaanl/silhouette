@@ -15,20 +15,36 @@ namespace {
 void createMesh(Mesh* mesh, aiMesh* impMesh) {
   mesh->materialIndex = impMesh->mMaterialIndex;
 
+#if 0
+  mesh->positions.emplaceBack(-1.0f, 0.0f, -1.0f);
+  mesh->positions.emplaceBack(-1.0f, 0.0f,  1.0f);
+  mesh->positions.emplaceBack( 1.0f, 0.0f,  1.0f);
+  mesh->positions.emplaceBack( 1.0f, 0.0f,  1.0f);
+  mesh->positions.emplaceBack( 1.0f, 0.0f, -1.0f);
+  mesh->positions.emplaceBack(-1.0f, 0.0f, -1.0f);
+
+  mesh->texCoords.emplaceBack(0.0f, 0.0f);
+  mesh->texCoords.emplaceBack(0.0f, 1.0f);
+  mesh->texCoords.emplaceBack(1.0f, 1.0f);
+  mesh->texCoords.emplaceBack(1.0f, 1.0f);
+  mesh->texCoords.emplaceBack(1.0f, 0.0f);
+  mesh->texCoords.emplaceBack(0.0f, 0.0f);
+
+#else
+
   U32 numVertices = impMesh->mNumVertices;
 
   mesh->positions.reserve(numVertices);
   mesh->texCoords.reserve(numVertices);
 
-  U16 index = 0;
   for (U32 i = 0; i < numVertices; ++i) {
     mesh->positions.emplaceBack(impMesh->mVertices[i].x, impMesh->mVertices[i].y,
                                 impMesh->mVertices[i].z);
     if (impMesh->mTextureCoords[0]) {
       mesh->texCoords.emplaceBack(impMesh->mTextureCoords[0][i].x, impMesh->mTextureCoords[0][i].y);
     }
-    mesh->indices.emplaceBack(index++);
   }
+#endif  // 0
 }
 
 void createNode(Node* node, aiNode* impNode) {

@@ -73,7 +73,7 @@ bool Image::loadFromStream(nu::InputStream* stream) {
   stbi_uc* result =
       stbi_load_from_memory(buffer.data(), static_cast<int>(buffer.size()), &x, &y, &channels, 4);
 
-  MemSize size = static_cast<I64>(channels) * x * y;
+  MemSize size = 4 * x * y;
   m_data.resize(size);
   std::memcpy(m_data.data(), result, size);
 
