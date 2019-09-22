@@ -3,6 +3,10 @@ cmake_minimum_required(VERSION 3.10)
 project(silhouette)
 
 add_subdirectory(../canvas canvas)
+
+option(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT "" OFF)
+option(ASSIMP_NO_EXPORT "" ON)
+option(ASSIMP_BUILD_COLLADA_IMPORTER "" ON)
 add_subdirectory(../assimp assimp)
 
 set(silhouette_HEADER_FILES
