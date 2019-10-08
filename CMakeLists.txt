@@ -9,8 +9,9 @@ project(silhouette)
 add_subdirectory(../canvas canvas)
 
 option(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT "" OFF)
-option(ASSIMP_NO_EXPORT "" ON)
+option(ASSIMP_BUILD_ASSIMP_TOOLS "" OFF)
 option(ASSIMP_BUILD_COLLADA_IMPORTER "" ON)
+option(ASSIMP_NO_EXPORT "" ON)
 add_subdirectory(../assimp assimp)
 
 set(silhouette_HEADER_FILES
