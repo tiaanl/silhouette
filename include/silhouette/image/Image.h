@@ -18,6 +18,8 @@ namespace si {
 
 class Image {
 public:
+  NU_DELETE_COPY(Image);
+
   // Create a blank alpha image.
   static Image createAlpha(const ca::Size& size, U8 intensity = 0);
 
@@ -56,8 +58,6 @@ public:
   void setPixel(const ca::Pos& pos, const ca::Color& color);
 
 private:
-  DELETE_COPY(Image);
-
   friend ca::TextureId createTextureFromImage(ca::Renderer*, const Image&, bool);
 
   // Format of the scene is stored in.

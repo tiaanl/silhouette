@@ -1,5 +1,5 @@
 #include "nucleus/Testing.h"
-#include "silhouette/scene/Scene.h"
+#include "silhouette/Scene/Scene.h"
 
 namespace si {
 
