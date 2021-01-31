@@ -3,8 +3,8 @@
 
 #include "canvas/Renderer/Types.h"
 #include "canvas/Utils/Color.h"
-#include "canvas/Utils/Pos.h"
-#include "canvas/Utils/Size.h"
+#include "floats/Pos.h"
+#include "floats/Size.h"
 #include "nucleus/Containers/DynamicArray.h"
 #include "nucleus/Streams/InputStream.h"
 
@@ -21,7 +21,7 @@ public:
   NU_DELETE_COPY(Image);
 
   // Create a blank alpha image.
-  static Image createAlpha(const ca::Size& size, U8 intensity = 0);
+  static Image createAlpha(const fl::Size& size, U8 intensity = 0);
 
   Image();
   Image(Image&& other);
@@ -34,11 +34,11 @@ public:
   }
 
   // Get the size of the image.
-  const ca::Size& size() const {
+  const fl::Size& size() const {
     return m_size;
   }
 
-  // Get the pixel scene for the image.
+  // Get the pixel Scene for the image.
   U8* data() const {
     return const_cast<U8*>(m_data.data());
   }
@@ -49,24 +49,24 @@ public:
   }
 
   // Create a blank image with the specified color.
-  void create(const ca::Size& size, const ca::Color& col = ca::Color::black);
+  void create(const fl::Size& size, const ca::Color& col = ca::Color::black);
 
-  // Load the image scene from a stream.
+  // Load the image Scene from a stream.
   bool loadFromStream(nu::InputStream* stream);
 
   // Set the color of a single pixel in the image.
-  void setPixel(const ca::Pos& pos, const ca::Color& color);
+  void setPixel(const fl::Pos& pos, const ca::Color& color);
 
 private:
   friend ca::TextureId createTextureFromImage(ca::Renderer*, const Image&, bool);
 
-  // Format of the scene is stored in.
+  // Format of the Scene is stored in.
   ca::TextureFormat m_format = ca::TextureFormat::Unknown;
 
   // The dimensions of the image.
-  ca::Size m_size;
+  fl::Size m_size;
 
-  // The buffer that holds the pixel scene.
+  // The buffer that holds the pixel Scene.
   nu::DynamicArray<U8> m_data;
 };
 

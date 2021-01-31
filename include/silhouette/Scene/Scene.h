@@ -1,9 +1,9 @@
 #ifndef SILHOUETTE_SCENE_SCENE_H_
 #define SILHOUETTE_SCENE_SCENE_H_
 
-#include "canvas/Math/Mat4.h"
-#include "canvas/Math/Vec3.h"
 #include "canvas/Utils/Color.h"
+#include "floats/Mat4.h"
+#include "floats/Vec3.h"
 #include "nucleus/Containers/DynamicArray.h"
 #include "nucleus/Text/StaticString.h"
 
@@ -11,12 +11,12 @@ namespace si {
 
 struct Mesh {
   MemSize materialIndex;
-  nu::DynamicArray<ca::Vec3> positions;
-  nu::DynamicArray<ca::Vec2> texCoords;
+  nu::DynamicArray<fl::Vec3> positions;
+  nu::DynamicArray<fl::Vec2> texCoords;
 };
 
 struct Node {
-  ca::Mat4 transform{ca::Mat4::identity};
+  fl::Mat4 transform{fl::Mat4::identity};
   nu::DynamicArray<MemSize> meshIndices;
   nu::DynamicArray<Node> children;
 };

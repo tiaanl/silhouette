@@ -1,12 +1,11 @@
 
+#include "assimp/Importer.hpp"
+#include "assimp/mesh.h"
+#include "assimp/scene.h"
 #include "nucleus/FilePath.h"
 #include "nucleus/Streams/FileInputStream.h"
 #include "nucleus/Text/StaticString.h"
 #include "silhouette/Scene/Scene.h"
-
-#include "assimp/Importer.hpp"
-#include "assimp/mesh.h"
-#include "assimp/scene.h"
 
 namespace si {
 
@@ -50,13 +49,13 @@ void createMesh(Mesh* mesh, aiMesh* impMesh) {
 void createNode(Node* node, aiNode* impNode) {
   // LOG(Info) << "createNode (" << impNode->mName.data << ") >>>";
 
-  node->transform.col[0] = ca::Vec4{impNode->mTransformation.a1, impNode->mTransformation.b1,
+  node->transform.col[0] = fl::Vec4{impNode->mTransformation.a1, impNode->mTransformation.b1,
                                     impNode->mTransformation.c1, impNode->mTransformation.d1};
-  node->transform.col[1] = ca::Vec4{impNode->mTransformation.a2, impNode->mTransformation.b2,
+  node->transform.col[1] = fl::Vec4{impNode->mTransformation.a2, impNode->mTransformation.b2,
                                     impNode->mTransformation.c2, impNode->mTransformation.d2};
-  node->transform.col[2] = ca::Vec4{impNode->mTransformation.a3, impNode->mTransformation.b3,
+  node->transform.col[2] = fl::Vec4{impNode->mTransformation.a3, impNode->mTransformation.b3,
                                     impNode->mTransformation.c3, impNode->mTransformation.d3};
-  node->transform.col[3] = ca::Vec4{impNode->mTransformation.a4, impNode->mTransformation.b4,
+  node->transform.col[3] = fl::Vec4{impNode->mTransformation.a4, impNode->mTransformation.b4,
                                     impNode->mTransformation.c4, impNode->mTransformation.d4};
 
   // LOG(Info) << "transform.col[0] = " << node->transform.col[0];

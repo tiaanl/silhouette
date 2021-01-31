@@ -1,7 +1,7 @@
-#include "silhouette/Image/Image.h"
+#include "silhouette/Image.h"
 
-#include "canvas/Math/Common.h"
 #include "canvas/Renderer/Renderer.h"
+#include "floats/Common.h"
 #include "nucleus/Logging.h"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -10,7 +10,7 @@
 namespace si {
 
 // static
-Image Image::createAlpha(const ca::Size& size, U8 intensity) {
+Image Image::createAlpha(const fl::Size& size, U8 intensity) {
   Image result;
 
   result.m_format = ca::TextureFormat::Alpha;
@@ -35,7 +35,7 @@ Image& Image::operator=(Image&& other) {
   return *this;
 }
 
-void Image::create(const ca::Size& size, const ca::Color& col) {
+void Image::create(const fl::Size& size, const ca::Color& col) {
   if (size.width && size.height) {
     // Store the size of the image.
     m_size = size;
@@ -48,13 +48,13 @@ void Image::create(const ca::Size& size, const ca::Color& col) {
     U8* data = m_data.data();
     U8* end = data + m_data.size();
     while (data < end) {
-      *data++ = static_cast<U8>(ca::round(col.r * 255.0f));
-      *data++ = static_cast<U8>(ca::round(col.g * 255.0f));
-      *data++ = static_cast<U8>(ca::round(col.b * 255.0f));
-      *data++ = static_cast<U8>(ca::round(col.a * 255.0f));
+      *data++ = static_cast<U8>(fl::round(col.r * 255.0f));
+      *data++ = static_cast<U8>(fl::round(col.g * 255.0f));
+      *data++ = static_cast<U8>(fl::round(col.b * 255.0f));
+      *data++ = static_cast<U8>(fl::round(col.a * 255.0f));
     }
   } else {
-    // Store the size and clear out the scene.
+    // Store the size and clear out the Scene.
     m_size = {0, 0};
     m_data.clear();
   }
@@ -102,7 +102,7 @@ bool Image::loadFromStream(nu::InputStream* stream) {
   return true;
 }
 
-void Image::setPixel(const ca::Pos& pos, const ca::Color& color) {
+void Image::setPixel(const fl::Pos& pos, const ca::Color& color) {
   U8* ptr = &m_data[pos.y * (m_size.width * 4) + (pos.x * 4)];
   *ptr++ = static_cast<U8>(round(color.r));
   *ptr++ = static_cast<U8>(round(color.g));
