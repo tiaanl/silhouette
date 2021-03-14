@@ -16,6 +16,12 @@ class Renderer;
 
 namespace si {
 
+enum class ImageFormat {
+  Alpha,
+  RedGreenBlue,
+  RedGreenBlueAlpha,
+};
+
 class Image {
 public:
   NU_DELETE_COPY(Image);
@@ -23,33 +29,26 @@ public:
   // Create a blank alpha image.
   static Image createAlpha(const fl::Size& size, U8 intensity = 0);
 
+  // Create an image with a solid color.
+  static Image createSolid(const fl::Size& size, const ca::Color& color);
+
   Image();
-  Image(Image&& other);
+  Image(Image&& other) noexcept;
   ~Image();
 
-  Image& operator=(Image&& other);
+  Image& operator=(Image&& other) noexcept;
 
-  ca::TextureFormat format() const {
+  NU_NO_DISCARD ImageFormat format() const {
     return m_format;
   }
 
-  // Get the size of the image.
-  const fl::Size& size() const {
+  NU_NO_DISCARD fl::Size size() const {
     return m_size;
   }
 
-  // Get the pixel Scene for the image.
-  U8* data() const {
-    return const_cast<U8*>(m_data.data());
+  NU_NO_DISCARD nu::ArrayView<U8> data() const {
+    return m_data.view();
   }
-
-  // The size in bytes of the stored image data.
-  MemSize dataSize() const {
-    return m_data.size();
-  }
-
-  // Create a blank image with the specified color.
-  void create(const fl::Size& size, const ca::Color& col = ca::Color::black);
 
   // Load the image Scene from a stream.
   bool loadFromStream(nu::InputStream* stream);
@@ -60,13 +59,13 @@ public:
 private:
   friend ca::TextureId createTextureFromImage(ca::Renderer*, const Image&, bool);
 
-  // Format of the Scene is stored in.
-  ca::TextureFormat m_format = ca::TextureFormat::Unknown;
+  // The format that the data is stored in.
+  ImageFormat m_format;
 
   // The dimensions of the image.
   fl::Size m_size;
 
-  // The buffer that holds the pixel Scene.
+  // The buffer that holds the pixel data.
   nu::DynamicArray<U8> m_data;
 };
 

@@ -23,7 +23,6 @@ set(silhouette_SOURCE_FILES
     )
 
 nucleus_add_library(silhouette ${silhouette_HEADER_FILES} ${silhouette_SOURCE_FILES})
-target_include_directories(silhouette PRIVATE ${Assimp_SOURCE_DIR}/include ${Assimp_BINARY_DIR}/include)
 target_link_libraries(silhouette PUBLIC canvas)
 target_link_libraries(silhouette PRIVATE assimp::assimp)
 
