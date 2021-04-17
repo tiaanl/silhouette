@@ -35,15 +35,15 @@ class Scene {
 public:
   Scene() = default;
 
-  const nu::DynamicArray<Mesh>& meshes() const {
+  nu::DynamicArray<Mesh>& meshes() {
     return meshes_;
   }
 
-  const nu::DynamicArray<Material>& materials() const {
+  nu::DynamicArray<Material>& materials() {
     return materials_;
   }
 
-  const Node& root_node() const {
+  Node& root_node() {
     return root_node_;
   }
 
