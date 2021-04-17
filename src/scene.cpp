@@ -1,17 +1,17 @@
+#include "silhouette/scene.h"
 
-#include "assimp/Importer.hpp"
-#include "assimp/mesh.h"
-#include "assimp/scene.h"
-#include "nucleus/FilePath.h"
-#include "nucleus/Streams/FileInputStream.h"
-#include "nucleus/Text/StaticString.h"
-#include "silhouette/Scene/Scene.h"
+#include <assimp/mesh.h>
+#include <assimp/scene.h>
+
+#include <assimp/Importer.hpp>
+
+#include "nucleus/Streams/InputStream.h"
 
 namespace si {
 
 namespace {
 
-void createMesh(Mesh* mesh, aiMesh* impMesh) {
+void create_mesh(Mesh* mesh, aiMesh* impMesh) {
   mesh->materialIndex = impMesh->mMaterialIndex;
 
 #if 0
@@ -46,7 +46,7 @@ void createMesh(Mesh* mesh, aiMesh* impMesh) {
 #endif  // 0
 }
 
-void createNode(Node* node, aiNode* impNode) {
+void create_node(Node* node, aiNode* impNode) {
   // LOG(Info) << "createNode (" << impNode->mName.data << ") >>>";
 
   node->transform.col[0] = fl::Vec4{impNode->mTransformation.a1, impNode->mTransformation.b1,
@@ -70,16 +70,18 @@ void createNode(Node* node, aiNode* impNode) {
   // LOG(Info) << "creating " << impNode->mNumChildren << " child nodes";
   for (U32 i = 0; i < impNode->mNumChildren; ++i) {
     auto result = node->children.emplaceBack();
-    createNode(&result.element(), impNode->mChildren[i]);
+    create_node(&result.element(), impNode->mChildren[i]);
   }
 
   // LOG(Info) << "<<< createNode";
 }
 
-void createMaterial(Material* dst, aiMaterial* src) {
+void create_material(Material* dst, aiMaterial* src) {
   aiColor4D color;
   if (src->Get(AI_MATKEY_COLOR_DIFFUSE, color) == aiReturn_SUCCESS) {
-    dst->diffuse.color = ca::Color{color.r, color.g, color.b, color.a};
+    dst->diffuse.color =
+        RGBA{static_cast<U8>(round(color.r * 255.0f)), static_cast<U8>(round(color.g * 255.0f)),
+             static_cast<U8>(round(color.b * 255.0f)), static_cast<U8>(round(color.a * 255.0f))};
   }
 
   unsigned int diffuseTextureCount = src->GetTextureCount(aiTextureType_DIFFUSE);
@@ -98,7 +100,7 @@ void createMaterial(Material* dst, aiMaterial* src) {
 
 }  // namespace
 
-bool loadCollada(Scene* scene, nu::InputStream* stream) {
+bool Scene::load_from_collada(nu::InputStream* stream) {
   Assimp::Importer importer;
 
   nu::InputStream::SizeType bytesRemaining = stream->getBytesRemaining();
@@ -134,29 +136,20 @@ bool loadCollada(Scene* scene, nu::InputStream* stream) {
       continue;
     }
 
-    auto result = scene->meshes.emplaceBack();
-    createMesh(&result.element(), impMesh);
+    auto result = meshes_.emplaceBack();
+    create_mesh(&result.element(), impMesh);
   }
 
   for (U32 i = 0; i < imp->mNumMaterials; ++i) {
     auto* impMaterial = imp->mMaterials[i];
 
-    auto result = scene->materials.pushBack({{ca::Color::black, {}}});
-    createMaterial(&result.element(), impMaterial);
+    auto result = materials_.pushBack({{{0, 0, 0, 0}, {}}});
+    create_material(&result.element(), impMaterial);
   }
 
-  createNode(&scene->rootNode, imp->mRootNode);
+  create_node(&root_node_, imp->mRootNode);
 
   return true;
-}
-
-bool loadCollada(Scene* scene, const nu::FilePath& path) {
-  nu::FileInputStream stream{path};
-  if (!stream.openedOk()) {
-    return false;
-  }
-
-  return loadCollada(scene, &stream);
 }
 
 }  // namespace si

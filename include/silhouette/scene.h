@@ -1,0 +1,58 @@
+#pragma once
+
+#include "floats/Mat4.h"
+#include "floats/Vec3.h"
+#include "nucleus/Containers/DynamicArray.h"
+#include "nucleus/Text/StaticString.h"
+#include "silhouette/color.h"
+
+namespace nu {
+class InputStream;
+}  // namespace nu
+
+namespace si {
+
+struct Mesh {
+  MemSize materialIndex;
+  nu::DynamicArray<fl::Vec3> positions;
+  nu::DynamicArray<fl::Vec2> texCoords;
+};
+
+struct Node {
+  fl::Mat4 transform{fl::Mat4::identity};
+  nu::DynamicArray<MemSize> meshIndices;
+  nu::DynamicArray<Node> children;
+};
+
+struct Material {
+  struct {
+    RGBA color;
+    nu::StaticString<128> texture;
+  } diffuse;
+};
+
+class Scene {
+public:
+  Scene() = default;
+
+  const nu::DynamicArray<Mesh>& meshes() const {
+    return meshes_;
+  }
+
+  const nu::DynamicArray<Material>& materials() const {
+    return materials_;
+  }
+
+  const Node& root_node() const {
+    return root_node_;
+  }
+
+  bool load_from_collada(nu::InputStream* stream);
+
+private:
+  nu::DynamicArray<Mesh> meshes_;
+  nu::DynamicArray<Material> materials_;
+  Node root_node_;
+};
+
+}  // namespace si

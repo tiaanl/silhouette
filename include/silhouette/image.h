@@ -1,18 +1,11 @@
 #ifndef SILHOUETTE_IMAGE_IMAGE_H_
 #define SILHOUETTE_IMAGE_IMAGE_H_
 
-#include "canvas/Renderer/Types.h"
-#include "canvas/Utils/Color.h"
 #include "floats/Pos.h"
 #include "floats/Size.h"
 #include "nucleus/Containers/DynamicArray.h"
 #include "nucleus/Streams/InputStream.h"
-
-namespace ca {
-
-class Renderer;
-
-}  // namespace ca
+#include "silhouette/color.h"
 
 namespace si {
 
@@ -30,7 +23,10 @@ public:
   static Image createAlpha(const fl::Size& size, U8 intensity = 0);
 
   // Create an image with a solid color.
-  static Image createSolid(const fl::Size& size, const ca::Color& color);
+  static Image createSolid(const fl::Size& size, const RGBA& color);
+
+  // Create an image from raw data.
+  static Image create_from_raw(const fl::Size& size, ImageFormat format, nu::DynamicArray<U8> data);
 
   Image();
   Image(Image&& other) noexcept;
@@ -51,14 +47,16 @@ public:
   }
 
   // Load the image Scene from a stream.
-  bool loadFromStream(nu::InputStream* stream);
+  bool load_from_png(nu::InputStream* stream);
+
+  // If the specified coordinates are within the image boundaries, set the `output` to the color at
+  // those coordinates.
+  bool pixel(I32 x, I32 y, RGBA* output);
 
   // Set the color of a single pixel in the image.
-  void setPixel(const fl::Pos& pos, const ca::Color& color);
+  void setPixel(const fl::Pos& pos, const RGBA& color);
 
 private:
-  friend ca::TextureId createTextureFromImage(ca::Renderer*, const Image&, bool);
-
   // The format that the data is stored in.
   ImageFormat m_format;
 
@@ -69,8 +67,10 @@ private:
   nu::DynamicArray<U8> m_data;
 };
 
+#if 0
 ca::TextureId createTextureFromImage(ca::Renderer* renderer, const Image& image,
                                      bool smooth = false);
+#endif  // 0
 
 }  // namespace si
 

@@ -1,7 +1,5 @@
-#include "silhouette/Image.h"
+#include "silhouette/image.h"
 
-#include "canvas/Renderer/Renderer.h"
-#include "floats/Common.h"
 #include "nucleus/Logging.h"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -21,7 +19,7 @@ Image Image::createAlpha(const fl::Size& size, U8 intensity) {
 }
 
 // static
-Image Image::createSolid(const fl::Size& size, const ca::Color& color) {
+Image Image::createSolid(const fl::Size& size, const RGBA& color) {
   Image result;
 
   if (!size.area()) {
@@ -32,20 +30,19 @@ Image Image::createSolid(const fl::Size& size, const ca::Color& color) {
   result.m_size = size;
   result.m_data.resize(size.width * size.height * 4);
 
-  struct C {
-    U8 r;
-    U8 g;
-    U8 b;
-    U8 a;
-  } c = {
-      static_cast<U8>(fl::round(255.0f * color.r)),
-      static_cast<U8>(fl::round(255.0f * color.g)),
-      static_cast<U8>(fl::round(255.0f * color.b)),
-      static_cast<U8>(fl::round(255.0f * color.a)),
-  };
+  RGBA* data = reinterpret_cast<RGBA*>(result.m_data.data());
+  std::fill(data, data + (size.width * size.height), color);
 
-  C* data = reinterpret_cast<C*>(result.m_data.data());
-  std::fill(data, data + (size.width * size.height), c);
+  return result;
+}
+
+// static
+Image Image::create_from_raw(const fl::Size& size, ImageFormat format, nu::DynamicArray<U8> data) {
+  Image result;
+
+  result.m_size = size;
+  result.m_format = format;
+  result.m_data = std::move(data);
 
   return result;
 }
@@ -65,7 +62,7 @@ Image& Image::operator=(Image&& other) noexcept {
   return *this;
 }
 
-bool Image::loadFromStream(nu::InputStream* stream) {
+bool Image::load_from_png(nu::InputStream* stream) {
   DCHECK(stream);
 
   nu::InputStream::SizeType bytesRemaining = stream->getBytesRemaining();
@@ -107,14 +104,24 @@ bool Image::loadFromStream(nu::InputStream* stream) {
   return true;
 }
 
-void Image::setPixel(const fl::Pos& pos, const ca::Color& color) {
-  U8* ptr = &m_data[pos.y * (m_size.width * 4) + (pos.x * 4)];
-  *ptr++ = static_cast<U8>(round(color.r));
-  *ptr++ = static_cast<U8>(round(color.g));
-  *ptr++ = static_cast<U8>(round(color.b));
-  *ptr = static_cast<U8>(round(color.a));
+bool Image::pixel(I32 x, I32 y, RGBA* output) {
+  if (x >= 0 && x < m_size.width && y >= 0 && y < m_size.height) {
+    *output = *(RGBA*)&m_data[(y * m_size.width + x) * sizeof(RGBA)];
+    return true;
+  }
+
+  return false;
 }
 
+void Image::setPixel(const fl::Pos& pos, const RGBA& color) {
+  U8* ptr = &m_data[pos.y * (m_size.width * 4) + (pos.x * 4)];
+  *ptr++ = color.red;
+  *ptr++ = color.green;
+  *ptr++ = color.blue;
+  *ptr = color.alpha;
+}
+
+#if 0
 ca::TextureId createTextureFromImage(ca::Renderer* renderer, const Image& image, bool smooth) {
 #if 0
   LOG(Info) << "Creating texture: format = " << (U32)image.m_format << ", size = " << image.m_size;
@@ -139,5 +146,6 @@ ca::TextureId createTextureFromImage(ca::Renderer* renderer, const Image& image,
   return renderer->createTexture(format, image.m_size, image.m_data.data(), image.m_data.size(),
                                  smooth);
 }
+#endif  // 0
 
 }  // namespace si
