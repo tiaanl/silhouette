@@ -1,6 +1,6 @@
 #include "silhouette/image.h"
 
-#include "nucleus/Logging.h"
+#include "nucleus/logging.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"

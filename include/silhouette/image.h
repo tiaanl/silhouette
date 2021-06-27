@@ -1,10 +1,9 @@
-#ifndef SILHOUETTE_IMAGE_IMAGE_H_
-#define SILHOUETTE_IMAGE_IMAGE_H_
+#pragma once
 
-#include "floats/Pos.h"
-#include "floats/Size.h"
-#include "nucleus/Containers/DynamicArray.h"
-#include "nucleus/Streams/InputStream.h"
+#include "floats/pos.h"
+#include "floats/size.h"
+#include "nucleus/Containers/dynamic_array.h"
+#include "nucleus/Streams/input_stream.h"
 #include "silhouette/color.h"
 
 namespace si {
@@ -73,5 +72,3 @@ ca::TextureId createTextureFromImage(ca::Renderer* renderer, const Image& image,
 #endif  // 0
 
 }  // namespace si
-
-#endif  // SILHOUETTE_IMAGE_IMAGE_H_

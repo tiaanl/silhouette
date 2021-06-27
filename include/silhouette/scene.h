@@ -1,9 +1,9 @@
 #pragma once
 
-#include "floats/Mat4.h"
-#include "floats/Vec3.h"
-#include "nucleus/Containers/DynamicArray.h"
-#include "nucleus/Text/StaticString.h"
+#include "floats/mat4.h"
+#include "floats/vec3.h"
+#include "nucleus/Containers/dynamic_array.h"
+#include "nucleus/Text/static_string.h"
 #include "silhouette/color.h"
 
 namespace nu {
