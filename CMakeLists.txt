@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.19)
 
 if (TARGET silhouette)
-    return()
+  return()
 endif ()
 
 project(silhouette)
@@ -23,7 +23,14 @@ set(SOURCE_FILES
 
 nucleus_add_library(silhouette ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(silhouette PUBLIC floats)
-target_link_libraries(silhouette PRIVATE assimp::assimp)
+if (APPLE)
+  message(${ASSIMP_INCLUDE_DIRS})
+  message(${ASSIMP_LIBRARIES})
+  target_include_directories(silhouette PRIVATE ${ASSIMP_INCLUDE_DIRS})
+  target_link_libraries(silhouette PRIVATE ${ASSIMP_LIBRARIES})
+else ()
+  target_link_libraries(silhouette PRIVATE assimp::assimp)
+endif ()
 
 set(TEST_FILES
     tests/image_tests.cpp

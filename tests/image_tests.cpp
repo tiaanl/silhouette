@@ -1,4 +1,4 @@
-#include <nucleus/Streams/file_input_stream.h>
+#include <nucleus/streams/file_input_stream.h>
 
 #include <catch2/catch.hpp>
 

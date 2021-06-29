@@ -5,7 +5,7 @@
 
 #include <assimp/Importer.hpp>
 
-#include "nucleus/Streams/input_stream.h"
+#include "nucleus/streams/input_stream.h"
 
 namespace si {
 
