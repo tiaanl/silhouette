@@ -1,10 +1,5 @@
 #include "silhouette/image.h"
 
-#include "nucleus/logging.h"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
 namespace si {
 
 // static
@@ -60,48 +55,6 @@ Image& Image::operator=(Image&& other) noexcept {
   m_data = std::move(other.m_data);
 
   return *this;
-}
-
-bool Image::load_from_png(nu::InputStream* stream) {
-  DCHECK(stream);
-
-  nu::InputStream::SizeType bytesRemaining = stream->getBytesRemaining();
-
-  nu::DynamicArray<U8> buffer;
-  buffer.resize(bytesRemaining);
-  stream->read(buffer.data(), buffer.size());
-
-  I32 x = 0, y = 0, channels = 0;
-  stbi_uc* result =
-      stbi_load_from_memory(buffer.data(), static_cast<int>(buffer.size()), &x, &y, &channels, 4);
-
-  MemSize size = 4 * x * y;
-  m_data.resize(size);
-  std::memcpy(m_data.data(), result, size);
-
-  stbi_image_free(result);
-
-  m_size = {x, y};
-
-  switch (channels) {
-    case 4:
-      m_format = ImageFormat::RedGreenBlueAlpha;
-      break;
-
-    case 3:
-      m_format = ImageFormat::RedGreenBlue;
-      break;
-
-    case 1:
-      m_format = ImageFormat::Alpha;
-      break;
-
-    default:
-      NOTREACHED();
-      break;
-  }
-
-  return true;
 }
 
 bool Image::pixel(I32 x, I32 y, RGBA* output) {

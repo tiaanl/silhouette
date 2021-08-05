@@ -45,9 +45,6 @@ public:
     return m_data.view();
   }
 
-  // Load the image Scene from a stream.
-  bool load_from_png(nu::InputStream* stream);
-
   // If the specified coordinates are within the image boundaries, set the `output` to the color at
   // those coordinates.
   bool pixel(I32 x, I32 y, RGBA* output);
