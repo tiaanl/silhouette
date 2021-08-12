@@ -1,6 +1,6 @@
 #include "silhouette/codec/image/png.h"
 
-#include "../../stb_image.h"
+#include "../../ext/stb_image.h"
 
 namespace si {
 

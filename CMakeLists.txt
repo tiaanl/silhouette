@@ -12,6 +12,7 @@ add_subdirectory(../floats floats)
 
 set(HEADER_FILES
     include/silhouette/codec/image/png.h
+    include/silhouette/codec/scene/obj.h
     include/silhouette/color.h
     include/silhouette/image.h
     include/silhouette/scene.h
@@ -19,9 +20,11 @@ set(HEADER_FILES
 
 set(SOURCE_FILES
     src/codec/image/png.cpp
+    src/codec/scene/obj.cpp
+    src/ext/stb_image.cpp
+    src/ext/tiny_obj_loader.cpp
     src/image.cpp
     src/scene.cpp
-    src/stb_image.cpp
     )
 
 nucleus_add_library(silhouette ${HEADER_FILES} ${SOURCE_FILES})
@@ -36,8 +39,9 @@ else ()
 endif ()
 
 set(TEST_FILES
-    tests/image_tests.cpp
-    tests/scene_tests.cpp
+    tests/codec/scene/obj_tests.cpp
+    # tests/image_tests.cpp
+    # tests/scene_tests.cpp
     )
 
 nucleus_add_executable(silhouette_tests ${TEST_FILES})

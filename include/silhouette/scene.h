@@ -1,9 +1,10 @@
 #pragma once
 
-#include "floats/mat4.h"
-#include "floats/vec3.h"
-#include "nucleus/containers/dynamic_array.h"
-#include "nucleus/text/static_string.h"
+#include <floats/mat4.h>
+#include <floats/vec3.h>
+#include <nucleus/containers/dynamic_array.h>
+#include <nucleus/text/dynamic_string.h>
+
 #include "silhouette/color.h"
 
 namespace nu {
@@ -13,9 +14,13 @@ class InputStream;
 namespace si {
 
 struct Mesh {
-  MemSize materialIndex;
+  nu::DynamicString name;
+  MemSize material_index = 0;
   nu::DynamicArray<fl::Vec3> positions;
-  nu::DynamicArray<fl::Vec2> texCoords;
+  nu::DynamicArray<fl::Vec3> normals;
+  nu::DynamicArray<fl::Vec2> tex_coords;
+
+  explicit Mesh(nu::StringView name) : name{name} {}
 };
 
 struct Node {
@@ -27,7 +32,7 @@ struct Node {
 struct Material {
   struct {
     RGBA color;
-    nu::StaticString<128> texture;
+    nu::DynamicString texture;
   } diffuse;
 };
 
