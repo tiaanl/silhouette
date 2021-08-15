@@ -10,6 +10,7 @@ TEST_CASE("obj") {
     nu::FileInputStream stream{nu::FilePath{__FILE__}.dirName().dirName().dirName() / "fixtures" /
                                "asteroid.obj"};
     auto maybe_scene = load_scene_from_obj(&stream);
+    CHECK(maybe_scene.has_value());
   }
 }
 

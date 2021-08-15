@@ -52,8 +52,6 @@ public:
     return root_node_;
   }
 
-  bool load_from_collada(nu::InputStream* stream);
-
 private:
   nu::DynamicArray<Mesh> meshes_;
   nu::DynamicArray<Material> materials_;
