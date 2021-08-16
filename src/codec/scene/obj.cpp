@@ -40,7 +40,6 @@ void finish_mesh(Context* ctx) {
     ctx->current_mesh->tex_coords.emplaceBack(ctx->tex_coords[index.tex_coord]);
   }
 
-  ctx->current_mesh->material_index = 0;
   ctx->current_mesh = nullptr;
 }
 
@@ -96,9 +95,65 @@ void do_index(void* user_data, tinyobj::index_t* indices, int num_indices) {
   }
 }
 
+void do_usemtl(void* user_data, const char* name, int material_id) {
+  auto ctx = to_context(user_data);
+  DCHECK(ctx->current_mesh);
+
+  ctx->current_mesh->material_index = material_id;
+}
+
+void do_mtllib(void* user_data, const tinyobj::material_t* materials, int num_materials) {
+  auto ctx = to_context(user_data);
+
+  for (int i = 0; i < num_materials; ++i) {
+    Material material;
+    material.diffuse.color.red = static_cast<U8>(materials[i].diffuse[0] * 256.0f);
+    material.diffuse.color.green = static_cast<U8>(materials[i].diffuse[1] * 256.0f);
+    material.diffuse.color.blue = static_cast<U8>(materials[i].diffuse[2] * 256.0f);
+    material.diffuse.color.alpha = 255;
+    material.diffuse.texture = materials[i].diffuse_texname.c_str();
+
+    ctx->scene->materials().emplaceBack(std::move(material));
+  }
+}
+
+class MaterialReader : public tinyobj::MaterialStreamReader {
+public:
+  explicit MaterialReader(MaterialLoaderFunc&& material_loader_func)
+    : tinyobj::MaterialStreamReader(stream_),
+      material_loader_func_{std::move(material_loader_func)} {}
+
+  bool operator()(const std::string& mat_id, std::vector<tinyobj::material_t>* materials,
+                  std::map<std::string, int>* mat_map, std::string* err) override {
+    auto material_stream = material_loader_func_(nu::StringView{mat_id.data(), mat_id.length()});
+    if (!material_stream) {
+      LOG(Warning) << "Material file not found. (" << mat_id << ")";
+      return false;
+    }
+
+    std::string buffer;
+    buffer.resize(material_stream->getBytesRemaining());
+    auto bytes_read = material_stream->read(buffer.data(), buffer.size());
+    if (bytes_read != buffer.size()) {
+      LOG(Warning) << "Could not read from .mtl file.";
+      return false;
+    }
+
+    std::stringbuf buf{buffer};
+    stream_.set_rdbuf(&buf);
+
+    return MaterialStreamReader::operator()(mat_id, materials, mat_map, err);
+  }
+
+private:
+  std::stringstream stream_;
+  MaterialLoaderFunc material_loader_func_;
+};
+
 }  // namespace
 
-nu::Optional<Scene> load_scene_from_obj(nu::InputStream* stream) {
+nu::Optional<Scene> load_scene_from_obj(nu::InputStream* stream,
+                                        MaterialLoaderFunc&& material_loader_func) {
   std::string buffer;
   buffer.resize(stream->getBytesRemaining());
   auto bytes_read = stream->read(buffer.data(), buffer.size());
@@ -113,17 +168,18 @@ nu::Optional<Scene> load_scene_from_obj(nu::InputStream* stream) {
   callbacks.normal_cb = do_normal;
   callbacks.texcoord_cb = do_tex_coord;
   callbacks.index_cb = do_index;
+  callbacks.usemtl_cb = do_usemtl;
+  callbacks.mtllib_cb = do_mtllib;
 
   std::stringbuf buf{buffer};
   std::istream in_stream(&buf);
 
   Scene result;
-  RGBA color{255, 0, 0, 255};
-  result.materials().emplaceBack(color);
 
   Context context{&result};
 
-  if (!tinyobj::LoadObjWithCallback(in_stream, callbacks, &context)) {
+  MaterialReader material_reader{std::move(material_loader_func)};
+  if (!tinyobj::LoadObjWithCallback(in_stream, callbacks, &context, &material_reader)) {
     LOG(Error) << "Could not load .obj file.";
     return {};
   }

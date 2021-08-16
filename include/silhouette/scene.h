@@ -7,10 +7,6 @@
 
 #include "silhouette/color.h"
 
-namespace nu {
-class InputStream;
-}  // namespace nu
-
 namespace si {
 
 struct Mesh {
