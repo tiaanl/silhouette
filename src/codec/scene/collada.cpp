@@ -119,6 +119,8 @@ nu::Optional<Scene> load_scene_from_collada(nu::InputStream* stream) {
   }
 #endif  // 0
 
+  Scene scene;
+
   for (U32 i = 0; i < imp->mNumMeshes; ++i) {
     aiMesh* imp_mesh = imp->mMeshes[i];
 
@@ -128,20 +130,20 @@ nu::Optional<Scene> load_scene_from_collada(nu::InputStream* stream) {
       continue;
     }
 
-    auto result = meshes_.emplaceBack(imp_mesh->mName.C_Str());
+    auto result = scene.meshes().emplaceBack(imp_mesh->mName.C_Str());
     create_mesh(&result.element(), imp_mesh);
   }
 
   for (U32 i = 0; i < imp->mNumMaterials; ++i) {
     auto* imp_material = imp->mMaterials[i];
 
-    auto result = materials_.pushBack({{{0, 0, 0, 0}, {}}});
+    auto result = scene.materials().pushBack({{{0, 0, 0, 0}, {}}});
     create_material(&result.element(), imp_material);
   }
 
-  create_node(&root_node_, imp->mRootNode);
+  create_node(&scene.root_node(), imp->mRootNode);
 
-  return true;
+  return scene;
 #else
   return {};
 #endif

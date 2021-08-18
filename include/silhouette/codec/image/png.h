@@ -1,8 +1,9 @@
 #pragma once
 
-#include <nucleus/optional.h>
 #include <nucleus/streams/input_stream.h>
 #include <silhouette/image.h>
+
+#include <nucleus/optional.hpp>
 
 namespace si {
 

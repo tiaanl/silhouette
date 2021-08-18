@@ -1,7 +1,8 @@
 #pragma once
 
-#include <nucleus/optional.h>
 #include <nucleus/streams/input_stream.h>
+
+#include <nucleus/optional.hpp>
 
 #include "silhouette/scene.h"
 
